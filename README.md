@@ -1,50 +1,62 @@
-# Welcome to your Expo app 👋
+# 🤰 MUM_CARE
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+**MUM_CARE** is a mobile app built with **React Native** to support pregnant women by helping them track their medications and monitor their health in real time.  
+It connects to IoT sensors via **MQTT** to display live **heart rate** and **body temperature**, making pregnancy care easier and more informed.
 
-## Get started
+---
 
-1. Install dependencies
+## ✨ Features
 
-   ```bash
-   npm install
-   ```
+- 💊 **Medication Management**
+  - Add, edit, and delete medications
+  - Choose frequency & duration (once daily, twice daily, etc.)
+  - Smart reminders with push notifications
 
-2. Start the app
+- 🫀 **Real-Time Vitals Monitoring**
+  - Live **heart rate** and **body temperature**
+  - Visual indicators on a human body diagram
+  - Data fetched via **MQTT broker** from IoT sensors
 
-   ```bash
-   npx expo start
-   ```
+- 🔔 **Smart Notifications**
+  - Medication time reminders
+  - Low supply & refill alerts
 
-In the output, you'll find options to open the app in a
+- 📅 **Health Tracking**
+  - Store start date and duration for each medicine
+  - Easily track compliance
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- 🖌 **Beautiful UI**
+  - Gradient headers, easy navigation, pregnancy-friendly design
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+---
 
-## Get a fresh project
+## 🛠️ Tech Stack
 
-When you're ready, run:
+| Category         | Technology |
+|-----------------|------------|
+| **Framework**   | [React Native](https://reactnative.dev/) + [Expo](https://expo.dev/) |
+| **Navigation**  | [Expo Router](https://expo.github.io/router/) |
+| **UI**          | React Native Paper / Ionicons / Custom Components |
+| **Real-time Data** | [MQTT.js](https://github.com/mqttjs/MQTT.js) |
+| **Notifications** | [expo-notifications](https://docs.expo.dev/versions/latest/sdk/notifications/) |
+| **Storage**     | AsyncStorage (or SQLite) |
+| **Build**       | Gradle + Java 17 |
 
-```bash
-npm run reset-project
-```
+---
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## 📡 Architecture Overview
 
-## Learn more
+```mermaid
+flowchart LR
+    subgraph MobileApp[📱 MUM_CARE App]
+    A[Medication Manager] --> B[Reminder Scheduler]
+    B -->|Push Notifications| A
+    C[MQTT Client] --> D[Vitals UI]
+    end
 
-To learn more about developing your project with Expo, look at the following resources:
+    subgraph IoT_Sensors[IoT Devices]
+    E[Heart Rate Sensor] -->|MQTT Publish| F((MQTT Broker))
+    G[Temperature Sensor] -->|MQTT Publish| F
+    end
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+    F -->|MQTT Subscribe| C
