@@ -12,6 +12,7 @@ import * as LocalAuthentication from "expo-local-authentication";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 
+
 const { width } = Dimensions.get("window");
 
 export default function AuthScreen() {
@@ -30,39 +31,38 @@ export default function AuthScreen() {
     setHasBiometrics(hasHardware && isEnrolled);
   };
 
-  const authenticate = async () => {
-    try {
-      setIsAuthenticating(true);
-      setError(null);
+const authenticate = async () => {
+  try {
+    setIsAuthenticating(true);
+    setError(null);
 
-      // Check if device has biometric hardware
-      const hasHardware = await LocalAuthentication.hasHardwareAsync();
-      const supportedTypes =
-        await LocalAuthentication.supportedAuthenticationTypesAsync();
-      const hasBiometrics = await LocalAuthentication.isEnrolledAsync();
+    const hasHardware = await LocalAuthentication.hasHardwareAsync();
+    const isEnrolled = await LocalAuthentication.isEnrolledAsync();
 
-      const auth = await LocalAuthentication.authenticateAsync({
-        promptMessage:
-          hasHardware && hasBiometrics
-            ? "Use Face ID or Touch ID"
-            : "Enter your PIN to access MedRemind",
-        fallbackLabel: "Use PIN",
-        cancelLabel: "Cancel",
-        disableDeviceFallback: false,
-      });
-
-      if (auth.success) {
-        router.replace("/");
-      } else {
-        setError("Authentication failed. Please try again.");
-      }
-    } catch (err) {
-      setError("An error occurred. Please try again.");
-      console.error(err);
-    } finally {
-      setIsAuthenticating(false);
+    if (!hasHardware || !isEnrolled) {
+      setError("Biometrics or PIN not available. Please enable them in device settings.");
+      return;
     }
-  };
+
+    const auth = await LocalAuthentication.authenticateAsync({
+      promptMessage: "Authenticate to access MedRemind",
+    });
+
+    console.log("AUTH RESULT:", auth);
+
+    if (auth.success) {
+      router.replace("/home");
+    } else {
+      setError(`Authentication failed: ${auth.error || "Please try again"}`);
+    }
+  } catch (err) {
+    console.error(err);
+    setError("An error occurred. Please try again.");
+  } finally {
+    setIsAuthenticating(false);
+  }
+};
+
 
   return (
     <LinearGradient colors={["#FF69B4", "#EC407A"]} style={styles.container}>

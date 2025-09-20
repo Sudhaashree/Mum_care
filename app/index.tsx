@@ -24,7 +24,7 @@ export default function SplashScreen() {
     ]).start();
 
     const timer = setTimeout(() => {
-      router.replace("/auth");
+      router.replace("/home");
     }, 2000);
 
     return () => clearTimeout(timer);
@@ -42,7 +42,7 @@ export default function SplashScreen() {
         ]}
       >
         <Ionicons name="medical" size={100} color="white" />
-        <Text style={styles.appName}>MOM CARE</Text>
+        <Text style={styles.appName}>MUM CARE</Text>
       </Animated.View>
     </View>
   );
