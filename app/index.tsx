@@ -2,6 +2,9 @@ import { View, Text, StyleSheet, Animated } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useRef } from "react";
 import { useRouter } from "expo-router";
+import 'react-native-get-random-values';
+import 'react-native-url-polyfill/auto';
+
 
 export default function SplashScreen() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -24,7 +27,7 @@ export default function SplashScreen() {
     ]).start();
 
     const timer = setTimeout(() => {
-      router.replace("/auth");
+      router.replace("/home");
     }, 2000);
 
     return () => clearTimeout(timer);
