@@ -62,6 +62,20 @@ const QUICK_ACTIONS = [
     color: "#E64A19",
     gradient: ["#FF5722", "#E64A19"] as [string, string],
   },
+  {
+    icon: "heart-outline" as const,
+    label: "Sensor\nTracker",
+    route: "/sensor" as const,
+    color: "#E64A19",
+    gradient: ["#FF5722", "#E64A19"] as [string, string],
+  },
+   {
+    icon: "star" as const,
+    label: "test\nLog",
+    route: "/mqtt" as const,
+    color: "#C2185B",
+    gradient: ["#E91E63", "#C2185B"] as [string, string],
+  },
 ];
 
 interface CircularProgressProps {

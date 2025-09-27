@@ -44,6 +44,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "2e1d5a44-81ae-43a2-9f81-abbed2f3885b"
+      }
+    },
+    "owner": "shankar-webdev"
   }
 }
