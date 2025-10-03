@@ -1,5 +1,3 @@
-// app/sensors/index.tsx
-
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -10,25 +8,67 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
+import mqtt, { MqttClient } from "mqtt";
+
+const brokerUrl = "ws://192.168.207.190:8083/mqtt"; // 👈 update with your broker's IP:PORT
+
+const TEMPERATURE_LIMIT = 39; 
+
 
 const Sensor = () => {
-  const [temperature, setTemperature] = useState(36);
-  const [heartRate, setHeartRate] = useState(70);
-  const [spo2, setSpo2] = useState(98);
+  const [temperature, setTemperature] = useState<number>(0);
+  const [tempWarning, setTempWarning] = useState<boolean>(false);
+  const [heartRate, setHeartRate] = useState<number>(0);
+  const [steps, setSteps] = useState<number>(0);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setTemperature(parseFloat((36 + Math.random() * 2).toFixed(1)));
-      setHeartRate(Math.floor(60 + Math.random() * 40));
-      setSpo2(Math.floor(90 + Math.random() * 10));
-    }, 2000);
+    const client: MqttClient = mqtt.connect(brokerUrl, {
+      clientId: "rn-sensor-" + Math.random().toString(16).slice(2, 8),
+      username: "mumcare", // 👈 same credentials as Arduino
+      password: "mumcare",
+      reconnectPeriod: 1000,
+    });
 
-    return () => clearInterval(interval);
+    client.on("connect", () => {
+      console.log("✅ Connected to MQTT broker");
+      client.subscribe("/temperature/data");
+      client.subscribe("/heartbeat/data");
+      client.subscribe("/stepcount/data");
+    });
+
+    client.on("message", (topic, message) => {
+      try {
+        const payload = JSON.parse(message.toString());
+
+        if (topic === "/temperature/data") {
+          const temp = payload.Temperature;
+  setTemperature(temp);
+
+  if (temp > TEMPERATURE_LIMIT) {
+    console.warn("🚨 Temperature limit exceeded:", temp);
+    // TODO: You can show an alert, trigger a vibration, change UI color, etc.
+  }
+        } else if (topic === "/heartbeat/data") {
+          setHeartRate(payload.Heartbeat);
+        } else if (topic === "/stepcount/data") {
+          setSteps(payload.Steps);
+        }
+      } catch (err) {
+        console.log("❌ JSON parse error:", err);
+      }
+    });
+
+    client.on("error", (err) => {
+      console.log("❌ MQTT Error:", err);
+    });
+
+    return () => {
+      client.end();
+    };
   }, []);
 
   return (
     <View style={styles.container}>
-      {/* Gradient Header */}
       <LinearGradient
         colors={["#FF69B4", "#EC407A"]}
         style={styles.headerGradient}
@@ -50,20 +90,24 @@ const Sensor = () => {
           <SensorCard
             icon="thermometer"
             label="Temperature"
-            value={`${temperature.toFixed(1)} °C`}
+            value={
+    temperature
+      ? `${Math.min(temperature, TEMPERATURE_LIMIT).toFixed(1)} °C`
+      : "—"
+  }
             color="#FF9800"
           />
           <SensorCard
             icon="heart"
             label="Heart Rate"
-            value={`${heartRate} bpm`}
+            value={heartRate ? `${heartRate} bpm` : "—"}
             color="#E91E63"
           />
           <SensorCard
-            icon="water"
-            label="SpO₂"
-            value={`${spo2}%`}
-            color="#3F51B5"
+            icon="walk"
+            label="Steps"
+            value={steps ? `${steps}` : "—"}
+            color="#4CAF50"
           />
         </ScrollView>
       </View>
@@ -71,7 +115,7 @@ const Sensor = () => {
   );
 };
 
-// 💡 Sensor Card Component (inline, can be moved to components/)
+// Reuse SensorCard
 const SensorCard = ({
   icon,
   label,
